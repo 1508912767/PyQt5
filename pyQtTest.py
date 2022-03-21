@@ -103,7 +103,7 @@ QMenu::separator {
     background-color: rgb(232,236,243);
 }
 '''
-# 图片翻页
+# 图片下一页下一页
 class ImageSliderWidget(QWidget, Ui_Form):
 
     def __init__(self, *args, **kwargs):
@@ -681,7 +681,6 @@ class CityLinkageWindow(QWidget):
 
 # 串口调试助手
 class SerialPort(QWidget, Ui_FormSerialPort):
-
     def __init__(self, *args, **kwargs):
         super(SerialPort, self).__init__(*args, **kwargs)
         self.setupUi(self)
@@ -704,6 +703,9 @@ class SerialPort(QWidget, Ui_FormSerialPort):
             self.labelStatus.setProperty('isOn', False)
             self.labelStatus.style().polish(self.labelStatus)  # 刷新样式
             return
+
+        # 如果是关闭状态，应该要先获取一下串口列表
+        self.getAvailablePorts()
 
         # 根据配置连接串口
         name = self.comboBoxPort.currentText()
