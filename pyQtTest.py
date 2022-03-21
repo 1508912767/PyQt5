@@ -392,6 +392,32 @@ class QRcode(QWidget):
             '<p><a href="https://blog.csdn.net/qq_34935373?spm=1010.2135.3001.5421"><img '  # 方式四类似方式三，只不过需要从网络中下载
             'src="https://blog.csdn.net/qq_34935373?spm=1010.2135.3001.5421"></a></p>')
 
+# 网页flash倒计时
+class WebFlash(QWebView):
+    def __init__(self, *args, **kwargs):
+        super(WebFlash, self).__init__(*args, **kwargs)
+        # 设置窗体无边框
+        # self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)  #窗口置顶，无边框，在任务栏不显示图标
+        # self.setWindowFlags(Qt.WindowStaysOnTopHint | self.windowFlags()| Qt.FramelessWindowHint |Qt.Tool)  #窗口置顶，无边框，在任务栏不显示图标
+        # self._width = QApplication.desktop().availableGeometry(self).width()        # 窗口靠边
+        # self.resize(800, 600)
+        # 浏览器设置
+        setting = QWebSettings.globalSettings()
+        setting.setAttribute(QWebSettings.PluginsEnabled, True)
+        # 解决xp下ssl问题
+        # self.page().networkAccessManager().sslErrors.connect(self.handleSslErrors)
+        sslconf = QSslConfiguration.defaultConfiguration()
+        clist = sslconf.caCertificates()
+        cnew = QSslCertificate.fromData(b"CaCertificates")
+        clist.extend(cnew)
+        sslconf.setCaCertificates(clist)
+        sslconf.setProtocol(QSsl.AnyProtocol)
+        QSslConfiguration.setDefaultConfiguration(sslconf)
+
+    def handleSslErrors(self, reply, errors):
+        # 解决ssl错误
+        reply.ignoreSslErrors()
+
 # 备用窗口
 class Taskbar(QWidget):
 
@@ -534,32 +560,6 @@ class Taskbar(QWidget):
             value = 0
         self.taskProgress.setValue(value)
 
-# 网页flash倒计时
-class WebFlash(QWebView):
-    def __init__(self, *args, **kwargs):
-        super(WebFlash, self).__init__(*args, **kwargs)
-        # 设置窗体无边框
-        # self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)  #窗口置顶，无边框，在任务栏不显示图标
-        # self.setWindowFlags(Qt.WindowStaysOnTopHint | self.windowFlags()| Qt.FramelessWindowHint |Qt.Tool)  #窗口置顶，无边框，在任务栏不显示图标
-        # self._width = QApplication.desktop().availableGeometry(self).width()        # 窗口靠边
-        # self.resize(800, 600)
-        # 浏览器设置
-        setting = QWebSettings.globalSettings()
-        setting.setAttribute(QWebSettings.PluginsEnabled, True)
-        # 解决xp下ssl问题
-        # self.page().networkAccessManager().sslErrors.connect(self.handleSslErrors)
-        sslconf = QSslConfiguration.defaultConfiguration()
-        clist = sslconf.caCertificates()
-        cnew = QSslCertificate.fromData(b"CaCertificates")
-        clist.extend(cnew)
-        sslconf.setCaCertificates(clist)
-        sslconf.setProtocol(QSsl.AnyProtocol)
-        QSslConfiguration.setDefaultConfiguration(sslconf)
-
-    def handleSslErrors(self, reply, errors):
-        # 解决ssl错误
-        reply.ignoreSslErrors()
-
 # 青铜助手
 class SortFilterProxyModel(QSortFilterProxyModel):
 
@@ -592,20 +592,6 @@ class CityLinkageWindow(QWidget):
         self.right_bar_layout = QGridLayout() # 右侧顶部搜索框网格布局
         self.right_bar_widget = QWidget() # 右侧顶部搜索框部件
 
-        self.search_icon = QLabel(chr(0xf002) + ' '+'搜索  ')
-        self.search_icon.setFont(qtawesome.font('fa', 16))
-        self.right_bar_widget_search_input = QLineEdit()
-        self.right_bar_widget_search_input.setPlaceholderText("输入功能, 回车进行搜索")
-        self.right_bar_widget_search_input.setStyleSheet(
-        '''QLineEdit{
-                border:1px solid gray;
-                width:300px;
-                border-radius:10px;
-                padding:2px 4px;
-        }''')
-
-        self.right_bar_layout.addWidget(self.search_icon,0,0,1,1)
-        self.right_bar_layout.addWidget(self.right_bar_widget_search_input,0,1,1,8)
         self.right_bar_widget.setLayout(self.right_bar_layout)
         layout.addWidget(self.right_bar_widget, 0, 0, 1, 4)
         ##################################
@@ -1470,13 +1456,13 @@ class Window(QMainWindow,QWidget):
         # 青铜助手
         self.gigaBronze = CityLinkageWindow()
         self.stackedWidget.addWidget(self.gigaBronze)
+        # 备用窗口
+        self.taskBar = Taskbar()
+        self.stackedWidget.addWidget(self.taskBar)
         # 网页flash
         self.webFlash = WebFlash()
         self.webFlash.load(QUrl('https://www.17sucai.com/preview/1749733/2019-07-08/%E6%97%B6%E9%97%B4/index.html'))
         self.stackedWidget.addWidget(self.webFlash)
-        # 备用窗口
-        self.taskBar = Taskbar()
-        self.stackedWidget.addWidget(self.taskBar)
         # CSDN二维码窗口
         self.qrCode = QRcode()
         self.stackedWidget.addWidget(self.qrCode)
