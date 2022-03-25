@@ -55,6 +55,8 @@ from threading import Thread
 from Lib.FlipWidget import FlipWidget
 from Lib.UiImageSlider import Ui_Form  # @UnresolvedImport
 
+from Lib.UiGiga import Ui_Forms  # @UnresolvedImport
+
 Desktop = "./"
 Picture = "lock.png"
 
@@ -103,6 +105,13 @@ QMenu::separator {
     background-color: rgb(232,236,243);
 }
 '''
+
+# 新增的Giga
+class Giga(QWidget, Ui_Forms):
+    def __init__(self, *args, **kwargs):
+        super(Giga, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+
 # 图片下一页下一页
 class ImageSliderWidget(QWidget, Ui_Form):
 
@@ -1469,12 +1478,15 @@ class Window(QMainWindow,QWidget):
         # 滑动条
         self.sildeWindow = SlideWindow()
         self.stackedWidget.addWidget(self.sildeWindow)
-        # 窗口翻转彩蛋
-        self.turnOverWindow = TurnOverWindow()
-        self.stackedWidget.addWidget(self.turnOverWindow)
+        # # 窗口翻转彩蛋
+        # self.turnOverWindow = TurnOverWindow()
+        # self.stackedWidget.addWidget(self.turnOverWindow)
         # 图片翻页
         self.imageSlidewidow = ImageSliderWidget()
         self.stackedWidget.addWidget(self.imageSlidewidow)
+        # giga
+        self.giga = Giga()
+        self.stackedWidget.addWidget(self.giga)
 
     # 随机气泡美化
     def init_CircleLineWindow(self):
@@ -2150,7 +2162,6 @@ class Window(QMainWindow,QWidget):
             self.stackedWidget.setCurrentIndex(7)  
         elif(self.sender().objectName() == "9"):
             self.stackedWidget.setCurrentIndex(8)                                        
-
 
 if __name__ == '__main__':
     import sys
